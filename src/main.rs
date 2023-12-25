@@ -37,7 +37,7 @@ fn main() {
                 Ok(location) => {
                     let snippets = find_all_snippets_in_directory(location).unwrap();
                     for snippet in snippets {
-                        println!("{}\n", snippet)
+                        println!("{}", snippet)
                     }
                 }
                 Err(_) => {}

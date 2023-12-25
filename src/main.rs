@@ -12,6 +12,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// get snippet
+    Get {
+        /// get a specific snippet
+        snippet: String,
+    },
     /// list all available snippets
     ListSnippets {},
 }
@@ -28,7 +33,7 @@ fn main() {
                 resolve_tilde_in_snippet_location(std::env::var("HOME"), DEFAULT_SNIPPET_LOCATION);
             match location {
                 Ok(location) => {
-                    let snippets = find_all_snippets_in_directory(location).unwrap();
+                    let snippets = find_all_snippets_in_directory(location.as_str()).unwrap();
                     for snippet in snippets {
                         println!("{}", snippet)
                     }
@@ -36,7 +41,21 @@ fn main() {
                 Err(_) => {}
             }
         }
-        None => {}
+        Some(Commands::Get { snippet }) => {
+            let snippet = get_snippet(snippet);
+            match snippet {
+                Ok(snippet) => {
+                    println!("{}", snippet);
+                }
+                Err(e) => {
+                    println!("error getting snippet: {}", e.to_string())
+                }
+            }
+        }
+
+        None => {
+            println!("unknown command")
+        }
     }
 }
 
@@ -57,7 +76,17 @@ fn resolve_tilde_in_snippet_location(
     }
 }
 
-fn find_all_snippets_in_directory(dir: String) -> Result<Vec<String>, String> {
+fn get_snippet(path: &str) -> Result<String, String> {
+    match fs::read_to_string(path) {
+        Ok(contents) => Ok(String::from(contents)),
+        Err(e) => Err(format!(
+            "should have been able to read file '{}', got error '{}'",
+            path, e
+        )),
+    }
+}
+
+fn find_all_snippets_in_directory(dir: &str) -> Result<Vec<String>, String> {
     let mut snippets: Vec<String> = Vec::new();
     let paths = fs::read_dir(dir).unwrap();
 
@@ -66,7 +95,7 @@ fn find_all_snippets_in_directory(dir: String) -> Result<Vec<String>, String> {
             Ok(path) => {
                 if path.path().is_dir() {
                     let mut this_snippets =
-                        find_all_snippets_in_directory(String::from(path.path().to_str().unwrap()));
+                        find_all_snippets_in_directory(path.path().to_str().unwrap());
                     match this_snippets.as_mut() {
                         Ok(this_snippets) => {
                             snippets.append(this_snippets);
@@ -108,7 +137,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_find_all_snippets_in_directory() {
-        let snippets = find_all_snippets_in_directory(String::from("./fixtures"));
+        let snippets = find_all_snippets_in_directory("./fixtures");
         assert_eq!(snippets.unwrap().len(), 2);
     }
     #[test]
@@ -118,5 +147,10 @@ mod tests {
             DEFAULT_SNIPPET_LOCATION,
         );
         assert_eq!(location.unwrap(), "/home/mrtazz/.snippets");
+    }
+    #[test]
+    fn test_get_snippet() {
+        let snippet = get_snippet("./fixtures/hello.snippet");
+        assert_eq!(snippet.unwrap(), "Hello");
     }
 }

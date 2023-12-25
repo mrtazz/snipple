@@ -35,7 +35,15 @@ fn main() {
                 Ok(location) => {
                     let snippets = find_all_snippets_in_directory(location.as_str()).unwrap();
                     for snippet in snippets {
-                        println!("{}", snippet)
+                        match snippet
+                            .as_str()
+                            .strip_prefix(format!("{}/", location).as_str())
+                        {
+                            Some(snippet) => {
+                                println!("{}", snippet)
+                            }
+                            None => {}
+                        }
                     }
                 }
                 Err(_) => {}
@@ -77,11 +85,19 @@ fn resolve_tilde_in_snippet_location(
 }
 
 fn get_snippet(path: &str) -> Result<String, String> {
-    match fs::read_to_string(path) {
-        Ok(contents) => Ok(String::from(contents)),
+    let location =
+        resolve_tilde_in_snippet_location(std::env::var("HOME"), DEFAULT_SNIPPET_LOCATION);
+    match location {
+        Ok(location) => match fs::read_to_string(format!("{}/{}", location, path)) {
+            Ok(contents) => Ok(String::from(contents)),
+            Err(e) => Err(format!(
+                "should have been able to read file '{}', got error '{}'",
+                path, e
+            )),
+        },
         Err(e) => Err(format!(
-            "should have been able to read file '{}', got error '{}'",
-            path, e
+            "couldn't resolve tilde in snippet location: {}",
+            e.to_string()
         )),
     }
 }

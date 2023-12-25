@@ -1,26 +1,42 @@
-use clap::Parser;
 use std::fs;
 
-/// Simple program to greet a person
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    /// Name of the person to greet
-    #[arg(short, long)]
-    name: String,
+use clap::{Parser, Subcommand};
 
-    /// Number of times to greet
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    /// Optional name to operate on
+    name: Option<String>,
+
+    /// Turn debugging information on
+    #[arg(short, long, action = clap::ArgAction::Count)]
+    debug: u8,
+
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// list all available snippets
+    ListSnippets {},
 }
 
 const SNIPPET_SUFFIX: &str = ".snippet";
+const DEFAULT_SNIPPET_LOCATION: &str = "~/.snippets";
 
 fn main() {
-    let args = Args::parse();
+    let cli = Cli::parse();
 
-    for _ in 0..args.count {
-        println!("Hello {}!", args.name)
+    match &cli.command {
+        Some(Commands::ListSnippets {}) => {
+            let snippets =
+                find_all_snippets_in_directory(String::from(DEFAULT_SNIPPET_LOCATION)).unwrap();
+            for snippet in snippets {
+                println!("{}\n", snippet)
+            }
+        }
+        None => {}
     }
 }
 

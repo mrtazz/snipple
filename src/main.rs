@@ -12,12 +12,12 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// get snippet
+    /// Get a specific snippet
     Get {
-        /// get a specific snippet
+        /// Path to the snippet to get
         snippet: String,
     },
-    /// list all available snippets
+    /// List all available snippets
     ListSnippets {},
 }
 

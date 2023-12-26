@@ -1,10 +1,16 @@
+use current_platform::{COMPILED_ON, CURRENT_PLATFORM};
 use std::env::VarError;
 use std::fs;
 
 use clap::{Parser, Subcommand};
 
+const SNIPPET_SUFFIX: &str = ".snippet";
+const DEFAULT_SNIPPET_LOCATION: &str = "~/.snippets";
+const SNIPPLE_VERSION: Option<&'static str> = option_env!("SNIPPLE_VERSION");
+
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
+#[command(disable_version_flag(true))]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
@@ -19,10 +25,9 @@ enum Commands {
     },
     /// List all available snippets
     ListSnippets {},
+    /// Print version and exit
+    Version {},
 }
-
-const SNIPPET_SUFFIX: &str = ".snippet";
-const DEFAULT_SNIPPET_LOCATION: &str = "~/.snippets";
 
 fn main() {
     let cli = Cli::parse();
@@ -59,6 +64,14 @@ fn main() {
                     println!("error getting snippet: {}", e.to_string())
                 }
             }
+        }
+        Some(Commands::Version {}) => {
+            println!(
+                "snipple {} {} compiled on {}",
+                SNIPPLE_VERSION.unwrap_or("dev"),
+                CURRENT_PLATFORM,
+                COMPILED_ON
+            )
         }
 
         None => {

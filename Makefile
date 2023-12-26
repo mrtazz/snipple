@@ -1,6 +1,8 @@
+VERSION := $(shell git describe --tags --always --dirty)
+
 .PHONY: build
 build:
-	cargo build --all-targets
+	SNIPPLE_VERSION=$(VERSION) cargo build --all-targets
 
 .PHONY: release
 release:

@@ -1,5 +1,6 @@
 [package]
 name = "snipple"
+author = "mrtazz"
 version = "0.1.0"
 edition = "2021"
 readme = "README.md"
@@ -7,3 +8,4 @@ homepage = "https://github.com/mrtazz/snipple"
 
 [dependencies]
 clap = { version = "4.4.11", features = ["derive"] }
+current_platform = "0.2.0"

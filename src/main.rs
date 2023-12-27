@@ -27,7 +27,7 @@ enum Commands {
         snippet: String,
     },
     /// List all available snippets
-    ListSnippets {
+    List {
         /// Run in alfred compatibility mode
         #[arg(long)]
         alfred: bool,
@@ -40,7 +40,7 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Commands::ListSnippets { alfred }) => {
+        Some(Commands::List { alfred }) => {
             let location = get_snippet_base_dir(std::env::var("HOME"), DEFAULT_SNIPPET_LOCATION);
             match location {
                 Ok(location) => {

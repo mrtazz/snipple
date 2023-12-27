@@ -12,6 +12,7 @@ const SNIPPLE_VERSION: Option<&'static str> = option_env!("SNIPPLE_VERSION");
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
+#[command(arg_required_else_help(true))]
 #[command(disable_version_flag(true))]
 struct Cli {
     #[command(subcommand)]

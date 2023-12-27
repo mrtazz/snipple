@@ -2,6 +2,8 @@ use current_platform::{COMPILED_ON, CURRENT_PLATFORM};
 use std::env::VarError;
 
 use clap::{Parser, Subcommand};
+use serde::{Deserialize, Serialize};
+use serde_json;
 
 mod snipple;
 
@@ -24,23 +26,49 @@ enum Commands {
         snippet: String,
     },
     /// List all available snippets
-    ListSnippets {},
+    ListSnippets {
+        /// Run in alfred compatibility mode
+        #[arg(long)]
+        alfred: bool,
+    },
     /// Print version and exit
     Version {},
+}
+
+#[derive(Serialize, Deserialize)]
+struct AlfredItem {
+    title: String,
+    arg: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct AlfredListResult {
+    items: Vec<AlfredItem>,
 }
 
 fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Commands::ListSnippets {}) => {
+        Some(Commands::ListSnippets { alfred }) => {
             let location = get_snippet_base_dir(std::env::var("HOME"), DEFAULT_SNIPPET_LOCATION);
             match location {
                 Ok(location) => {
                     let m = snipple::Manager::new(location);
                     let snippets = m.list_all_snippets().unwrap();
-                    for snippet in snippets {
-                        println!("{}", snippet)
+                    if *alfred {
+                        let mut result = AlfredListResult { items: Vec::new() };
+                        for snippet in snippets {
+                            result.items.push(AlfredItem {
+                                title: snippet.clone(),
+                                arg: snippet.clone(),
+                            });
+                        }
+                        println!("{}", serde_json::to_string(&result).unwrap());
+                    } else {
+                        for snippet in snippets {
+                            println!("{}", snippet)
+                        }
                     }
                 }
                 Err(_) => {}

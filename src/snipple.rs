@@ -52,6 +52,8 @@ impl Manager {
                                     match filename
                                         .strip_prefix(format!("{}/", self.base_dir).as_str())
                                     {
+                                        // only add snippets which had the right prefix. Not sure
+                                        // if there is ever a case where that could not be true
                                         Some(filename) => snippets.push(filename.to_string()),
                                         None => {}
                                     }

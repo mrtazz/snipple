@@ -2,9 +2,9 @@ use current_platform::{COMPILED_ON, CURRENT_PLATFORM};
 use std::env::VarError;
 
 use clap::{Parser, Subcommand};
-use serde::{Deserialize, Serialize};
 use serde_json;
 
+mod alfred;
 mod snipple;
 
 const DEFAULT_SNIPPET_LOCATION: &str = "~/.snippets";
@@ -36,17 +36,6 @@ enum Commands {
     Version {},
 }
 
-#[derive(Serialize, Deserialize)]
-struct AlfredItem {
-    title: String,
-    arg: String,
-}
-
-#[derive(Serialize, Deserialize)]
-struct AlfredListResult {
-    items: Vec<AlfredItem>,
-}
-
 fn main() {
     let cli = Cli::parse();
 
@@ -58,9 +47,9 @@ fn main() {
                     let m = snipple::Manager::new(location);
                     let snippets = m.list_all_snippets().unwrap();
                     if *alfred {
-                        let mut result = AlfredListResult { items: Vec::new() };
+                        let mut result = alfred::ListResult { items: Vec::new() };
                         for snippet in snippets {
-                            result.items.push(AlfredItem {
+                            result.items.push(alfred::Item {
                                 title: snippet.clone(),
                                 arg: snippet.clone(),
                             });

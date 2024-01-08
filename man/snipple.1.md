@@ -8,8 +8,7 @@ date: DATE_PLACEHOLDER
 ---
 
 <!-- This is the sniple(1) man page, written in Markdown. -->
-<!-- To generate the roff version, run `make man`, -->
-<!-- and the man page will appear in the ‘target’ directory. -->
+<!-- To generate the roff version, run `make man` -->
 
 # NAME
 
@@ -35,15 +34,22 @@ snipple — a simple snippet manager
 
 # DESCRIPTION
 
+`snipple` is a command line utility to manage reusable snippets of text. The
+core idea is that snippets should just be text files in a directory structure
+that can be managed within a filesystem. This enables a flexible way of
+interacting and managing snippets via e.g. syncing with cloud services or
+tools like `rsync`, or tracking changes with version control tooling like
+`git`.
 
 
-# META OPTIONS
+
+# META OPTIONS AND COMMANDS
 
 `--help`
 : Show list of command-line options.
 
 `version`
-: Show version of eza.
+: Show version of snipple.
 
 
 

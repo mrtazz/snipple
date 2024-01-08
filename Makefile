@@ -26,5 +26,12 @@ test:
 	CARGO_TERM_COLOR=always cargo test --verbose --workspace
 
 .PHONY: install
-install: release
+install: release man
+	install -d $(PREFIX)/bin
 	install -m 0555 $(RELEASE_BIN) $(PREFIX)/bin
+	install -d $(PREFIX)/share/man/man1/
+	install -m 0644 $(MANPAGE) $(PREFIX)/share/man/man1/
+
+.PHONY: local-install
+local-install:
+	$(MAKE) install PREFIX=usr/local

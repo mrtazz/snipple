@@ -1,7 +1,7 @@
 NAME := snipple
 VERSION := $(shell git describe --tags --always --dirty)
 BUILD_DAY := $(shell date -u +"%Y-%m-%d")
-MANPAGE := man/snipple.1
+MANPAGE := docs/man/snipple.1
 PREFIX ?= "/usr/local"
 RELEASE_BIN := "./target/release/snipple"
 

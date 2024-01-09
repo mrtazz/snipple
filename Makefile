@@ -1,3 +1,4 @@
+NAME := snipple
 VERSION := $(shell git describe --tags --always --dirty)
 BUILD_DAY := $(shell date -u +"%Y-%m-%d")
 MANPAGE := man/snipple.1
@@ -35,3 +36,27 @@ install: release man
 .PHONY: local-install
 local-install:
 	$(MAKE) install PREFIX=usr/local
+
+.DEFAULT_GOAL := build
+
+###
+# Release build tasks
+###
+
+RELEASE_ARTIFACTS_DIR := .release_artifacts
+CHECKSUM_FILE := $(RELEASE_ARTIFACTS_DIR)/checksums.txt
+
+$(RELEASE_ARTIFACTS_DIR):
+	install -d $@
+
+.PHONY: build-standalone
+build-standalone: man release $(RELEASE_ARTIFACTS_DIR)
+	mv $(MANPAGE) $(RELEASE_ARTIFACTS_DIR)/
+	mv $(RELEASE_BIN) $(RELEASE_ARTIFACTS_DIR)/$(NAME)-$(VERSION).linux.amd64
+	shasum -a 256 $(RELEASE_ARTIFACTS_DIR)/$(NAME)-$(VERSION).linux.amd64 >> $(CHECKSUM_FILE)
+
+
+.PHONY: github-release
+github-release:
+	gh release create $(VERSION) --title 'Release $(VERSION)' \
+	 	--notes-file docs/releases/$(VERSION).md $(RELEASE_ARTIFACTS_DIR)/*

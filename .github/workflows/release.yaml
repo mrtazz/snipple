@@ -27,3 +27,5 @@ jobs:
 
     - name: create release
       run: make github-release
+      env:
+        GH_TOKEN: ${{ github.token }}

@@ -1,14 +1,17 @@
-name: test
+name: release
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize]
+  push:
+    tags: '*'
 
 jobs:
-  unit:
-    name: unit
+  packages:
+    permissions:
+        contents: write
     runs-on: ubuntu-latest
+    env:
+      BUILDER: "Github Actions <noreply@github.com>"
 
     steps:
     - uses: actions/checkout@v3
@@ -19,8 +22,10 @@ jobs:
         sudo dpkg -i pandoc-3.1.11.1-1-amd64.deb
         rm -f pandoc-3.1.11.1-1-amd64.deb
 
-    - name: build man page
-      run: make man
+    - name: build artifacts
+      run: make build-standalone
 
-    - name: run tests
-      run: make test
+    - name: create release
+      run: make github-release
+      env:
+        GH_TOKEN: ${{ github.token }}

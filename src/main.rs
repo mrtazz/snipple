@@ -1,13 +1,12 @@
 use current_platform::{COMPILED_ON, CURRENT_PLATFORM};
-use std::env::VarError;
 
 use clap::{Parser, Subcommand};
 use serde_json;
 
 mod alfred;
+mod config;
 mod snipple;
 
-const DEFAULT_SNIPPET_LOCATION: &str = "~/.snippets";
 const SNIPPLE_VERSION: Option<&'static str> = option_env!("SNIPPLE_VERSION");
 
 #[derive(Parser)]
@@ -41,45 +40,35 @@ fn main() {
 
     match &cli.command {
         Some(Commands::List { alfred }) => {
-            let location = get_snippet_base_dir(std::env::var("HOME"), DEFAULT_SNIPPET_LOCATION);
-            match location {
-                Ok(location) => {
-                    let m = snipple::Manager::new(location);
-                    let snippets = m.list_all_snippets().unwrap();
-                    if *alfred {
-                        let mut result = alfred::ListResult { items: Vec::new() };
-                        for snippet in snippets {
-                            result.items.push(alfred::Item {
-                                title: snippet.clone(),
-                                arg: snippet.clone(),
-                            });
-                        }
-                        println!("{}", serde_json::to_string(&result).unwrap());
-                    } else {
-                        for snippet in snippets {
-                            println!("{}", snippet)
-                        }
-                    }
+            let cfg = config::Config::new(None).unwrap();
+            let m = snipple::Manager::new(&cfg);
+            let snippets = m.list_all_snippets().unwrap();
+            if *alfred {
+                let mut result = alfred::ListResult { items: Vec::new() };
+                for snippet in snippets {
+                    result.items.push(alfred::Item {
+                        title: snippet.clone(),
+                        arg: snippet.clone(),
+                    });
                 }
-                Err(_) => {}
+                println!("{}", serde_json::to_string(&result).unwrap());
+            } else {
+                for snippet in snippets {
+                    println!("{}", snippet)
+                }
             }
         }
         Some(Commands::Get { snippet }) => {
-            let location = get_snippet_base_dir(std::env::var("HOME"), DEFAULT_SNIPPET_LOCATION);
-            match location {
-                Ok(location) => {
-                    let m = snipple::Manager::new(location);
-                    let snippet = m.get_snippet(snippet);
-                    match snippet {
-                        Ok(snippet) => {
-                            println!("{}", snippet);
-                        }
-                        Err(e) => {
-                            println!("error getting snippet: {}", e.to_string())
-                        }
-                    }
+            let cfg = config::Config::new(None).unwrap();
+            let m = snipple::Manager::new(&cfg);
+            let snippet = m.get_snippet(snippet);
+            match snippet {
+                Ok(snippet) => {
+                    println!("{}", snippet);
                 }
-                Err(_) => {}
+                Err(e) => {
+                    println!("error getting snippet: {}", e.to_string())
+                }
             }
         }
         Some(Commands::Version {}) => {
@@ -94,30 +83,5 @@ fn main() {
         None => {
             println!("unknown command")
         }
-    }
-}
-
-fn get_snippet_base_dir(home: Result<String, VarError>, location: &str) -> Result<String, String> {
-    if location.starts_with("~/") {
-        match home {
-            Ok(home) => {
-                // we should be fine to unwrap() here since we already checked for the prefix
-                return Ok(format!("{}/{}", home, location.strip_prefix("~/").unwrap()));
-            }
-            Err(e) => return Err(String::from(e.to_string())),
-        }
-    } else {
-        return Ok(String::from(location));
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn test_get_snippet_base_dir() {
-        let location =
-            get_snippet_base_dir(Ok(String::from("/home/mrtazz")), DEFAULT_SNIPPET_LOCATION);
-        assert_eq!(location.unwrap(), "/home/mrtazz/.snippets");
     }
 }

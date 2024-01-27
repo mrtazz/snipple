@@ -86,7 +86,7 @@ mod tests {
     #[test]
     fn test_find_all_snippets_in_directory() {
         let m = Manager {
-            config: &config::Config::new(Some(String::from("fixtures/simple_config.yaml")))
+            config: &config::Config::new(Some(String::from("fixtures/simple_config.yaml")), false)
                 .unwrap(),
         };
         let snippets = m.list_all_snippets();
@@ -95,7 +95,7 @@ mod tests {
     #[test]
     fn test_get_snippet() {
         let m = Manager {
-            config: &config::Config::new(Some(String::from("fixtures/simple_config.yaml")))
+            config: &config::Config::new(Some(String::from("fixtures/simple_config.yaml")), false)
                 .unwrap(),
         };
         let snippet = m.get_snippet("hello.snippet");
@@ -104,7 +104,7 @@ mod tests {
     #[test]
     fn test_get_snippet_in_subdir() {
         let m = Manager {
-            config: &config::Config::new(Some(String::from("fixtures/simple_config.yaml")))
+            config: &config::Config::new(Some(String::from("fixtures/simple_config.yaml")), false)
                 .unwrap(),
         };
         let snippet = m.get_snippet("nested/test.snippet");

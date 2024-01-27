@@ -14,6 +14,9 @@ const SNIPPLE_VERSION: Option<&'static str> = option_env!("SNIPPLE_VERSION");
 #[command(arg_required_else_help(true))]
 #[command(disable_version_flag(true))]
 struct Cli {
+    /// Enable debug mode for additional output
+    #[arg(long)]
+    debug: bool,
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -40,7 +43,7 @@ fn main() {
 
     match &cli.command {
         Some(Commands::List { alfred }) => {
-            let cfg = config::Config::new(None).unwrap();
+            let cfg = config::Config::new(None, cli.debug).unwrap();
             let m = snipple::Manager::new(&cfg);
             let snippets = m.list_all_snippets().unwrap();
             if *alfred {
@@ -59,7 +62,7 @@ fn main() {
             }
         }
         Some(Commands::Get { snippet }) => {
-            let cfg = config::Config::new(None).unwrap();
+            let cfg = config::Config::new(None, cli.debug).unwrap();
             let m = snipple::Manager::new(&cfg);
             let snippet = m.get_snippet(snippet);
             match snippet {

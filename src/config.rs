@@ -6,6 +6,7 @@ use std::fs::File;
 pub struct Config {
     snippet_suffix: Option<String>,
     base_dir: Option<String>,
+    debug: Option<bool>,
 }
 
 const DEFAULT_SNIPPET_LOCATION: &str = "~/.snippets";
@@ -14,19 +15,28 @@ const CONFIG_LOCATIONS: &'static [&'static str] =
     &["~/.config/snipple/config.yaml", "~/.snipple.yaml"];
 
 impl Config {
-    pub fn new(filepath: Option<String>) -> Result<Self, String> {
+    pub fn new(filepath: Option<String>, debug: bool) -> Result<Self, String> {
         match filepath {
             Some(f) => {
-                let cfg = try_yaml_read(f)?;
+                let mut cfg = try_yaml_read(f)?;
+                cfg.debug = Some(debug);
                 return Ok(cfg);
             }
             None => {
                 // No config file was provided so lets check default locations
                 for cfg_path in CONFIG_LOCATIONS {
-                    let cfg = try_yaml_read(String::from(*cfg_path))?;
+                    let mut cfg = try_yaml_read(String::from(*cfg_path))?;
+                    cfg.debug = Some(debug);
                     return Ok(cfg);
                 }
-                Err(format!("No config file to parse"))
+                if debug {
+                    println!("No config file to parse. Using defaults.");
+                }
+                Ok(Config {
+                    snippet_suffix: Some(String::from(DEFAULT_SNIPPET_SUFFIX)),
+                    base_dir: Some(String::from(DEFAULT_SNIPPET_LOCATION)),
+                    debug: Some(debug),
+                })
             }
         }
     }
@@ -66,7 +76,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_get_snippet_base_dir() {
-        let location = Config::new(Some(String::from("fixtures/simple_config.yaml")))
+        let location = Config::new(Some(String::from("fixtures/simple_config.yaml")), false)
             .unwrap()
             .get_snippet_base_dir();
         assert_eq!(location, "./fixtures/snippets");

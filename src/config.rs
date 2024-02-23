@@ -75,10 +75,11 @@ fn try_yaml_read(fpath: String) -> Result<Config, String> {
 mod tests {
     use super::*;
     #[test]
-    fn test_get_snippet_base_dir() {
-        let location = Config::new(Some(String::from("fixtures/simple_config.yaml")), false)
-            .unwrap()
-            .get_snippet_base_dir();
+    fn test_get_simple_config() {
+        let cfg = Config::new(Some(String::from("fixtures/test_config.yaml")), false).unwrap();
+        let location = cfg.get_snippet_base_dir();
+        let suffix = cfg.get_snippet_suffix();
         assert_eq!(location, "./fixtures/snippets");
+        assert_eq!(suffix, ".snp");
     }
 }

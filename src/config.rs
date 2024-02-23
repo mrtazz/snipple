@@ -87,4 +87,10 @@ mod tests {
         assert_eq!(location, "./fixtures/snippets");
         assert_eq!(suffix, ".snp");
     }
+    #[test]
+    fn test_sanitize_tilde() {
+        std::env::set_var("HOME", "/home/test");
+        assert_eq!(sanitize_tilde_to_home("./bla"), "./bla");
+        assert_eq!(sanitize_tilde_to_home("~/bla"), "/home/test/bla");
+    }
 }

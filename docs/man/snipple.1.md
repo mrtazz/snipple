@@ -41,6 +41,17 @@ interacting and managing snippets via e.g. syncing with cloud services or
 tools like `rsync`, or tracking changes with version control tooling like
 `git`.
 
+# CONFIGURATION
+
+In order to support configuration of behaviour `snipple` looks for
+configuration in the locations `~/.config/snipple/config.yaml` and
+`~/.snipple.yaml`. The config file can contain the following properties:
+
+**base_dir:**
+: the base location to look for snippets in
+
+**snippet_suffix:**
+: the suffix that is being used for snippet files
 
 
 # META OPTIONS AND COMMANDS

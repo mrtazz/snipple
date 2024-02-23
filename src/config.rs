@@ -18,14 +18,14 @@ impl Config {
     pub fn new(filepath: Option<String>, debug: bool) -> Result<Self, String> {
         match filepath {
             Some(f) => {
-                let mut cfg = try_yaml_read(f)?;
+                let mut cfg = try_yaml_read(sanitize_tilde_to_home(f.as_str()))?;
                 cfg.debug = Some(debug);
                 return Ok(cfg);
             }
             None => {
                 // No config file was provided so lets check default locations
                 for cfg_path in CONFIG_LOCATIONS {
-                    let mut cfg = try_yaml_read(String::from(*cfg_path))?;
+                    let mut cfg = try_yaml_read(sanitize_tilde_to_home(cfg_path))?;
                     cfg.debug = Some(debug);
                     return Ok(cfg);
                 }
@@ -48,18 +48,23 @@ impl Config {
         );
     }
     pub fn get_snippet_base_dir(&self) -> String {
-        let home = std::env::var("HOME").unwrap();
         let location = String::from(
             self.base_dir
                 .as_ref()
                 .unwrap_or(&String::from(DEFAULT_SNIPPET_LOCATION)),
         );
-        if location.starts_with("~/") {
-            // we should be fine to unwrap() here since we already checked for the prefix
-            return format!("{}/{}", home, location.strip_prefix("~/").unwrap());
-        } else {
-            return location;
-        }
+
+        return sanitize_tilde_to_home(location.as_str());
+    }
+}
+
+fn sanitize_tilde_to_home(path: &str) -> String {
+    let home = std::env::var("HOME").unwrap();
+    if path.starts_with("~/") {
+        // we should be fine to unwrap() here since we already checked for the prefix
+        return format!("{}/{}", home, path.strip_prefix("~/").unwrap());
+    } else {
+        return String::from(path);
     }
 }
 

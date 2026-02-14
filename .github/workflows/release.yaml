@@ -18,7 +18,7 @@ jobs:
 
     - name: install dependencies
       run: |
-        sudo wget https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION)}pandoc-${PANDOC_VERSION}-${PANDOC_PKG_VERSION}-amd64.deb
+        sudo wget https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}pandoc-${PANDOC_VERSION}-${PANDOC_PKG_VERSION}-amd64.deb
         sudo dpkg -i pandoc-${PANDOC_VERSION}-${PANDOC_PKG_VERSION}-amd64.deb
         rm -f pandoc-${PANDOC_VERSION}-${PANDOC_PKG_VERSION}-amd64.deb
       env:

@@ -32,12 +32,16 @@ jobs:
       run: make github-release
       env:
         GH_TOKEN: ${{ github.token }}
+
   artifacts:
     permissions:
         contents: write
+    runs-on: ${{matrix.os}}
+    env:
+      BUILDER: "Github Actions <noreply@github.com>"
+
 	  strategy:
       matrix:
-        # You can add more, for any target you'd like!
         include:
           - build: linux
             arch: amd64
@@ -59,6 +63,3 @@ jobs:
       run: make upload-release-artifacts
       env:
         GH_TOKEN: ${{ github.token }}
-
-
-

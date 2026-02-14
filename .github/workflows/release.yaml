@@ -25,8 +25,8 @@ jobs:
         PANDOC_VERSION: 3.9
         PANDOC_PKG_VERSION: 1
 
-    - name: build artifacts
-      run: make build-standalone
+    - name: build man page
+      run: make man
 
     - name: create release
       run: make github-release

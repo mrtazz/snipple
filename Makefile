@@ -63,7 +63,7 @@ github-release:
 	gh release create $(VERSION) --title 'v$(VERSION)' \
 	 	--notes-file docs/releases/$(VERSION).md $(MANPAGE)
 
-.PHONY: upload-release-artifact
-upload-release-artifact:
+.PHONY: upload-release-artifacts
+upload-release-artifacts:
 	gh release upload $(VERSION) $(RELEASE_ARTIFACTS_DIR)/*
 

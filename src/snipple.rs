@@ -7,7 +7,7 @@ pub struct Manager<'a> {
 }
 
 impl Manager<'_> {
-    pub fn new(cfg: &config::Config) -> Manager {
+    pub fn new(cfg: &config::Config) -> Manager<'_> {
         return Manager { config: cfg };
     }
     pub fn get_snippet(&self, name: &str) -> Result<String, String> {

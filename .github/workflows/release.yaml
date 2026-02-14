@@ -34,13 +34,14 @@ jobs:
         GH_TOKEN: ${{ github.token }}
 
   artifacts:
+    name: build ${{matrix.os}} artifacts
     permissions:
         contents: write
     runs-on: ${{matrix.os}}
     env:
       BUILDER: "Github Actions <noreply@github.com>"
 
-	  strategy:
+    strategy:
       matrix:
         include:
           - build: linux
